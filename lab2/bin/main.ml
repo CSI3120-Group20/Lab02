@@ -1,1 +1,7 @@
-let () = print_endline "Hello, World!"
+type job = 
+   Duration of int
+  |Start_time of int
+  |Priority of int
+
+
+  
