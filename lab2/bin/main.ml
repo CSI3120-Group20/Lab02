@@ -4,14 +4,8 @@ type job = {
   priority : int;
 }
 
-let read_jobs () =
-  let list_jobs = [];
-  for job_num = 0 to num_jobs do
-    list_jobs @ [ask_information job_num]
-  done;
-
-  Printf.printf "Choose a scheduling strategy (1 for No Overlaps, 2 for Max Priority, 3 for Minimize Idle Time): ";
-  let scheduling_strategy = input_line stdin in print_endline scheduling_strategy;
+let time_to_minutes hrs mins = 
+  (int_of_string mins) +   (int_of_string hrs)*60
 
 let ask_information job_num = 
   (* We were reminded by ChatGPT to open the stdin, as the example in OCaml documentation did not include this *)
@@ -29,7 +23,17 @@ let ask_information job_num =
 
   { duration = (int_of_string duration); start_time = (time_to_minutes start_time_hrs start_time_mins); priority = (int_of_string priority) }
 
+let read_jobs num_jobs =
+  let list_jobs = ref [] in
+  for job_num = 0 to num_jobs do
+    list_jobs := !list_jobs @ [ask_information job_num]
+  done;
+  !list_jobs
+
 (* Main method down here: *)
 Printf.printf "How many jobs do you want to schedule? ";
 let num_jobs = input_line stdin in
-let () = print_endline (read_jobs num_jobs)
+let () = print_endline (read_jobs num_jobs);
+
+Printf.printf "Choose a scheduling strategy (1 for No Overlaps, 2 for Max Priority, 3 for Minimize Idle Time): ";
+let scheduling_strategy = input_line stdin in print_endline scheduling_strategy;
