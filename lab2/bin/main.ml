@@ -27,13 +27,33 @@ let read_jobs num_jobs =
   for job_num = 0 to num_jobs do
     list_jobs := !list_jobs @ [ask_information job_num]
   done;
-  !list_jobs
+   !list_jobs
   (* Syntax for this function was corrected by ChatGPT, allowing use of a ref object properly *)
 
-(* Main method down here: *)
-Printf.printf "How many jobs do you want to schedule? ";
-let num_jobs = input_line stdin in
-let () = (read_jobs num_jobs)
 
-Printf.printf "Choose a scheduling strategy (1 for No Overlaps, 2 for Max Priority, 3 for Minimize Idle Time): ";
-let scheduling_strategy = input_line stdin in print_endline scheduling_strategy;
+(*Auxiliary function for sorting jobs by starttimes*)
+let sort_by_start_time jobs = 
+  List.sort (fun j1 j2 -> (compare j1.start_time j2.start_time)) jobs;;
+
+(*Schedule jobs*)
+let schedule_jobs jobs=   
+  let sorted = sort_by_start_time jobs in (*The let ... in expression of defining the scope of a variable is explained by chatGPT*)
+  let rec overlap scheduled remaining = 
+    match remaining with
+    | [] -> scheduled
+    | job::tail ->
+        match scheduled with
+        | [] -> overlap [job] tail
+        | last_job :: _ ->
+          if job.start_time >= (last_job.start_time + last_job.duration) then
+            overlap(job::scheduled) tail
+          else
+            overlap scheduled tail in
+    List.rev (overlap[]sorted)
+
+
+(*Main method down here: *)
+
+(* Printf.printf "How many jobs do you want to schedule? "; *)
+
+
