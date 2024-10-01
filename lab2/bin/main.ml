@@ -134,17 +134,16 @@ let () =
   print_job_list tst;
   
   (*Actual main running*)
+  (*Prompt the user for input*)
   let job_num = job_number() in
-
   let job_list = read_jobs job_num in
   
+  let test = schedule_jobs job_list in (*Test schedule_jobs on user input*)
 
-  
-  print_job_list jobs;
-
+  print_job_list test;
  
   (* DEBUG: DELETE LATER*)
-  print_job_list job_list;
+  (* print_job_list job_list; *)
 
 
 (* Main method down here: *)
