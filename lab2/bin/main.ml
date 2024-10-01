@@ -84,6 +84,7 @@ let read_jobs num_jobs =
   (* Syntax for this function was corrected by ChatGPT, allowing use of a ref object properly *)
 
 
+
 (*Auxiliary function for sorting jobs by starttimes*)
 let sort_by_start_time jobs = 
   List.sort (fun j1 j2 -> (compare j1.start_time j2.start_time)) jobs;;
@@ -111,9 +112,6 @@ let schedule_jobs jobs=
 
 (* Printf.printf "How many jobs do you want to schedule? "; *)
 
-
-
-
 (* DEBUG: DELETE LATER*)
 let print_job_list job_list =
   List.iter (fun job ->
@@ -124,7 +122,6 @@ let print_job_list job_list =
 
 (* Main program *)
 let () = 
-
   (*Test schedule jobs*)
   let jobs = [
   { start_time = 1; duration = 3;priority = 1};
@@ -144,6 +141,8 @@ let () =
 
   
   print_job_list jobs;
+
+ 
   (* DEBUG: DELETE LATER*)
   print_job_list job_list;
 
