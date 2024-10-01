@@ -90,19 +90,21 @@ let sort_by_start_time jobs =
 
 (*Schedule jobs*)
 let schedule_jobs jobs=   
+  (*Sort the jobs by start time in ascending order*)
   let sorted = sort_by_start_time jobs in (*The let ... in expression of defining the scope of a variable is explained by chatGPT*)
+  (*Auxiliary function for checking overlap*)
   let rec overlap scheduled remaining = 
     match remaining with
-    | [] -> scheduled
-    | job::tail ->
+    | [] -> scheduled (*if no remaining jobs left,  return scheduled jobs*)
+    | job::tail ->    (*retrieve head of remaining jobs*)
         match scheduled with
-        | [] -> overlap [job] tail
-        | last_job :: _ ->
-          if job.start_time >= (last_job.start_time + last_job.duration) then
-            overlap(job::scheduled) tail
+        | [] -> overlap [job] tail (*if no jobs are scheduled, schedule the head job*)
+        | last_job :: _ -> (*Check for overlap*)
+          if job.start_time >= (last_job.start_time + last_job.duration) then (*Checks if next job starts after the previous job fnishes or at exactly when the job finishes*)
+            overlap(job::scheduled) tail (*Schedule the current job if no overlap*)
           else
-            overlap scheduled tail in
-    List.rev (overlap[]sorted)
+            overlap scheduled tail in (*skip current job due to overlap*)
+    List.rev (overlap[]sorted) (*reverse the current job since the new jobs are added to the front*)
 
 
 (*Main method down here: *)
@@ -122,10 +124,26 @@ let print_job_list job_list =
 
 (* Main program *)
 let () = 
+
+  (*Test schedule jobs*)
+  let jobs = [
+  { start_time = 1; duration = 3;priority = 1};
+  { start_time = 2; duration = 1;priority = 3};
+  { start_time = 5; duration = 2;priority = 2};
+  { start_time = 6; duration = 1;priority = 4};
+  ]in
+
+  let tst = schedule_jobs jobs in
+  print_job_list tst;
+  
+  (*Actual main running*)
   let job_num = job_number() in
 
   let job_list = read_jobs job_num in
+  
 
+  
+  print_job_list jobs;
   (* DEBUG: DELETE LATER*)
   print_job_list job_list;
 
