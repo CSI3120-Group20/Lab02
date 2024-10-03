@@ -89,10 +89,10 @@ let read_jobs num_jobs =
 let sort_by_start_time jobs = 
   List.sort (fun j1 j2 -> (compare j1.start_time j2.start_time)) jobs;;
 
-(*Schedule jobs*)
+(*No overlap*)
 let schedule_jobs jobs=   
   (*Sort the jobs by start time in ascending order*)
-  let sorted = sort_by_start_time jobs in (*The let ... in expression of defining the scope of a variable is explained by chatGPT*)
+  let sorted = sort_by_start_time jobs in (*The let ... in expression of defining the scope of a variable is explained by chatGPT *)
   (*Auxiliary function for checking overlap*)
   let rec overlap scheduled remaining = 
     match remaining with
@@ -105,8 +105,14 @@ let schedule_jobs jobs=
             overlap(job::scheduled) tail (*Schedule the current job if no overlap*)
           else
             overlap scheduled tail in (*skip current job due to overlap*)
-    List.rev (overlap[]sorted) (*reverse the current job since the new jobs are added to the front*)
+  List.rev (overlap[]sorted) (*reverse the current job since the new jobs are added to the front *)
 
+
+(*Minimize idle time *)
+let minimize_idle_time jobs = 
+  let no_overlap = schedule_jobs jobs in (*Make sure no jobs overlap*)
+  let sorted = sort_by_start_time no_overlap in (*Sort the jobs by start time to minimize idle time*)
+  sorted
 
 (*Main method down here: *)
 
@@ -122,17 +128,32 @@ let print_job_list job_list =
 
 (* Main program *)
 let () = 
-  (*Test schedule jobs*)
+  (*Test no overlap*)
+  Printf.printf "Test no overlap";
+  Printf.printf "\n";
   let jobs = [
-  { start_time = 1; duration = 3;priority = 1};
-  { start_time = 2; duration = 1;priority = 3};
-  { start_time = 5; duration = 2;priority = 2};
-  { start_time = 6; duration = 1;priority = 4};
+  { start_time = 570; duration = 60;priority = 3};
+  { start_time = 660; duration = 45;priority = 5};
   ]in
 
   let tst = schedule_jobs jobs in
   print_job_list tst;
-  
+  Printf.printf "------------------------------------------";
+  Printf.printf "Test min idle time";
+  Printf.printf "\n";
+  (*Test minimize idle time*)
+  let jobs = [
+  { start_time = 540; duration = 60; priority = 2 };  
+  { start_time = 510; duration = 20; priority = 2 };
+  { start_time = 520; duration = 45; priority = 3 };  
+  { start_time = 610; duration = 30; priority = 2 };  
+  ]in
+
+  let min_idle_time = minimize_idle_time jobs in
+
+  print_job_list min_idle_time;
+
+  Printf.printf "-------------------------------------------";
   (*Actual main running*)
   (*Prompt the user for input*)
   let job_num = job_number() in
