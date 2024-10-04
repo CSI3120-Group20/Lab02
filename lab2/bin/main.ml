@@ -10,7 +10,7 @@ type job = {
 * 
 * returns the number of jobs `num_jobs`
 *)
-let rec job_number() = 
+let rec get_job_number() = 
   print_string "How many jobs do you want to schedule? ";
   
   (* Read the input from user and store it in `input` *)
@@ -22,7 +22,7 @@ let rec job_number() =
 
     if num_jobs < 0 then(
       print_endline "Please enter a positive integer.";
-      job_number()
+      get_job_number()
     )
 
     else if num_jobs = 0 then(
@@ -38,7 +38,7 @@ let rec job_number() =
     with
     | Failure _ ->
       print_endline "Invalid input. Please enter a non-negative integer.";
-      job_number()
+      get_job_number()
 
 
 let time_to_minutes hrs mins = 
@@ -205,7 +205,7 @@ let () =
   Printf.printf "-------------------------------------------";
   (*Actual main running*)
   (*Prompt the user for input*)
-  let job_num = job_number() in
+  let job_num = get_job_number() in
   let job_list = read_jobs job_num in
   
   let test = schedule_jobs job_list in (*Test schedule_jobs on user input*)
