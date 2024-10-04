@@ -66,7 +66,7 @@ let ask_information job_num =
   let priority = read_line () in
 
   { duration = (int_of_string duration); start_time = (time_to_minutes start_time_hrs start_time_mins); priority = (int_of_string priority) }
-
+  (* Syntax for this function was corrected by ChatGPT, allowing use of ; symbol and keyword in properly *)
 
 (* 
 * This function calls ask_information() in a for loop
