@@ -53,22 +53,26 @@ let time_to_minutes hrs mins =
 *
 * Return a `job` type variable 
 *)
-let ask_information job_num = 
-  Printf.printf "For job %d, please enter the following details:\nStart Time (hours): " job_num;
-  let start_time_hrs = read_line () in
-  
-  Printf.printf "Start Time (minutes): ";
-  let start_time_mins = read_line () in
+let rec ask_information job_num = 
+  try
+    Printf.printf "For job %d, please enter the following details:\nStart Time (hours): " job_num;
+    let start_time_hrs = read_line () in
+    
+    Printf.printf "Start Time (minutes): ";
+    let start_time_mins = read_line () in
 
-  Printf.printf "Duration (minutes): ";
-  let duration = read_line () in
-  
-  Printf.printf "Priority: ";
-  let priority = read_line () in
+    Printf.printf "Duration (minutes): ";
+    let duration = read_line () in
+    
+    Printf.printf "Priority: ";
+    let priority = read_line () in
 
-  { duration = (int_of_string duration); start_time = (time_to_minutes start_time_hrs start_time_mins); priority = (int_of_string priority) }
-  (* Syntax for this function was corrected by ChatGPT, allowing use of ; symbol and keyword in properly *)
-
+    { duration = (int_of_string duration); start_time = (time_to_minutes start_time_hrs start_time_mins); priority = (int_of_string priority) }
+    (* Syntax for this function was corrected by ChatGPT, allowing use of ; symbol and keyword in properly *)
+  with
+  | Failure _ ->
+    print_endline "Invalid input. Please enter an integer.";
+    ask_information job_num
 (* 
 * This function calls ask_information() in a for loop
 *
