@@ -8,7 +8,7 @@ type job = {
 (* 
 * This recursive function reads the number of jobs
 * 
-* returns the number of jobs `num_jobs`
+* Return the number of jobs `num_jobs`
 *)
 let rec get_job_number() = 
   print_string "How many jobs do you want to schedule? ";
@@ -26,13 +26,14 @@ let rec get_job_number() =
     )
 
     else if num_jobs = 0 then(
-      print_endline "You have not scheduled any jobs";
+      print_endline "You have not scheduled any jobs.\n";
 
-      (* Return `num_jobs` *)
-      num_jobs
+      (* Exit the program with status code 0 *)
+      exit 0
     )
 
     else
+      (* Return `num_jobs` *)
       num_jobs
 
     with
@@ -50,7 +51,7 @@ let time_to_minutes hrs mins =
 *
 * job_num: A number label for the job
 *
-* returns a `job` type variable 
+* Return a `job` type variable 
 *)
 let ask_information job_num = 
   Printf.printf "For job %d, please enter the following details:\nStart Time (hours): " job_num;
@@ -73,7 +74,7 @@ let ask_information job_num =
 *
 * num_jobs: The total number of jobs that entered by user
 *
-* returns a list of job: `list_jobs`
+* Return a list of job: `list_jobs`
 *)
 let read_jobs num_jobs =
   let list_jobs = ref [] in
@@ -84,13 +85,72 @@ let read_jobs num_jobs =
   (* Syntax for this function was corrected by ChatGPT, allowing use of a ref object properly *)
 
 
+(* 
+* This recursive function prompts the user to choose a job scheduling strategy.
+*
+* Return the option number that entered by user.
+*)
+let rec scheduling_strategy_option() =
+  print_string "\nChoose a scheduling strategy (1 for No Overlaps, 2 for Max Priority, 3 for Minimize Idle Time):";
+
+  (* Read the input from user and store it in `input` *)
+  let input = read_line() in
+
+  try
+    (* Convert the `input` from string to integer *)
+    let num_option = int_of_string input in
+
+    if num_option = 1 || num_option = 2 || num_option = 3 then(
+      
+      (* Return `num_jobs` *)
+      num_option
+    )
+
+    else(
+      print_endline "Invalid number. Please enter 1 or 2 or 3.";
+
+      (* call scheduling_strategy_option() recursively *)
+      scheduling_strategy_option()
+    )
+
+  with
+  | Failure _ ->
+    print_endline "Invalid input. Please enter an integer.";
+    scheduling_strategy_option()
+
 
 (*Auxiliary function for sorting jobs by starttimes*)
 let sort_by_start_time jobs = 
   List.sort (fun j1 j2 -> (compare j1.start_time j2.start_time)) jobs;;
 
+
+(* 
+* This function is to compare jobs by start time, and by priority
+* if start time are equal.
+*
+*)
+let compare_by_start_time_and_priority job1 job2 =
+  (* Compare the jobs by start time *)
+  let start_time_diff = compare job1.start_time job2.start_time in
+
+  if start_time_diff = 0 then
+    (* 
+    * Compare the jobs by priority if start time are equal 
+    * 
+    * Return A negative integer (< 0) if job1.priority < job2.priority (i.e., job1 has higher priority).
+    * Return Zero (0) if both jobs have the same priority.
+    * Return A positive integer (> 0) if job1.priority > job2.priority (i.e., job2 has higher priority).
+    * compare job1.priority job2.priority
+    *)
+    compare job1.priority job2.priority
+
+  else
+    (* Else return the result of the comparison by start time *)
+    start_time_diff
+
+
 (*No overlap*)
-let schedule_jobs jobs=   
+let no_overlab_schedule jobs =
   (*Sort the jobs by start time in ascending order*)
   let sorted = sort_by_start_time jobs in (*The let ... in expression of defining the scope of a variable is explained by chatGPT *)
   (*Auxiliary function for checking overlap*)
@@ -108,109 +168,86 @@ let schedule_jobs jobs=
   List.rev (overlap[]sorted) (*reverse the current job since the new jobs are added to the front *)
 
 
+(* 
+* This function reads the job list and then schedule the job
+* by their priority.
+* 
+* Each job is assigned a numerical priority, with a lower number
+* indicating a higher priority.
+* 
+* If any jobs have the same start time, sort the jobs by priority.
+* i.e. Schedule the job first if they have higher priority.
+* 
+* If two jobs have the same start time and priority, start one of
+* them, then start another one until the first one is finished.
+
+* Return a list of scheduled job: `scheduled_jobs`
+*)
+let max_priority_schedule (job_list) = 
+  (* 
+  * Sort the jobs by start time, and by priority if start time
+  * are equal in ascending order 
+  *)
+  let scheduled_jobs = List.sort compare_by_start_time_and_priority job_list in
+
+  (* Return a list of scheduled job *)
+  scheduled_jobs
+
+
 (*Minimize idle time *)
-let minimize_idle_time jobs = 
-  let no_overlap = schedule_jobs jobs in (*Make sure no jobs overlap*)
+let min_idle_time_schedule jobs = 
+  let no_overlap = no_overlab_schedule jobs in (*Make sure no jobs overlap*)
   let sorted = sort_by_start_time no_overlap in (*Sort the jobs by start time to minimize idle time*)
   sorted
 
-(*Main method down here: *)
 
-(* Printf.printf "How many jobs do you want to schedule? "; *)
+(* 
+* This function calls scheduling_strategy_option() to retrieve
+* the option number for scheduling strategy, then it reads the
+* job list given by the user and finally prints the scheduled
+* job list accroding to the selected schedule strategy.
+* 
+* Return None
+*)
+let print_scheduled_jobs (job_list) =
+  (* Retrieve the option number for scheduling strategy *)
+  let option_num = scheduling_strategy_option() in
 
-(* DEBUG: DELETE LATER*)
-let print_job_list job_list =
+  let option_str = 
+    if option_num = 1 then
+      "No Overlaps"
+    else if option_num = 2 then
+      "Max Priority"
+    else
+      "Minimize Idle Time"
+  in
+
+  let scheduled_job_list = 
+    if option_num = 1 then
+      no_overlab_schedule (job_list)
+    else if option_num = 2 then
+      max_priority_schedule (job_list)
+    else
+      (* if option_num = 3 then *)
+      min_idle_time_schedule (job_list)
+  in
+
+  Printf.printf "\nScheduled Jobs (%s):\n" option_str;
+
   List.iter (fun job ->
-    Printf.printf "Duration: %d minutes, Start Time: %d minutes, Priority: %d\n"
-      job.duration job.start_time job.priority
-  ) job_list
+    Printf.printf "Job scheduled: Start Time = %d minutes, Duration =  %d minutes, Priority = %d\n"
+    job.start_time job.duration job.priority
+  ) scheduled_job_list;
+
+  print_newline ()
 
 
 (* Main program *)
 let () = 
-  (*Test no overlap*)
-  Printf.printf "-------------------------------------------------\n";
-  Printf.printf "Test no overlap";
-  Printf.printf "\n";
-  let jobs = [
-  { start_time = 570; duration = 60;priority = 3};
-  { start_time = 660; duration = 45;priority = 5};
-  ]in
-
-  let jobs1 = [{start_time = 580; duration = 60; priority = 7};
-               {start_time = 550; duration = 100; priority = 8};
-               {start_time = 750; duration = 10; priority = 1};]in
-  let jobs2 = [{start_time = 20; duration = 60; priority = 7};
-               {start_time = 50; duration = 100; priority = 8};
-               {start_time = 100; duration = 10; priority = 1};]in
-  let tst = schedule_jobs jobs in
-  let tst1 = schedule_jobs jobs1 in
-  let tst2 = schedule_jobs jobs2 in
-  Printf.printf "Testcase 1";
-  Printf.printf "\n";
-  print_job_list tst;
-  Printf.printf "Testcase 2";
-  Printf.printf "\n";
-  print_job_list tst1;
-  Printf.printf "Testcase 3";
-  Printf.printf "\n";
-  print_job_list tst2;
-  
-  
-  (*Test minimize idle time*)
-  let t1 = [
-  { start_time = 540; duration = 60; priority = 2 };  
-  { start_time = 510; duration = 20; priority = 2 };
-  { start_time = 520; duration = 45; priority = 3 };  
-  { start_time = 610; duration = 30; priority = 2 };  
-  ]in
-  Printf.printf "------------------------------------------\n";
-  Printf.printf "Test min idle time";
-  Printf.printf "\n";
-  Printf.printf "Test case 1";
-  Printf.printf "\n";
-  let min_idle_time = minimize_idle_time t1 in
-  print_job_list min_idle_time;
-
-  let t2 = [
-  { start_time = 40; duration = 10; priority = 2 };  
-  { start_time = 60; duration = 20; priority = 2 };
-  { start_time = 100; duration = 15; priority = 3 };  
-  { start_time = 90; duration = 10; priority = 2 };  
-  ]in
-
-  Printf.printf "Test min idle time";
-  Printf.printf "\n";
-  Printf.printf "Test case 2";
-  Printf.printf "\n";
-  let min_idle_time1 = minimize_idle_time t2 in
-  print_job_list min_idle_time1;
-
-  let t3 = [
-  { start_time = 100; duration = 60; priority = 2 };  
-  { start_time = 150; duration = 10; priority = 2 };
-  { start_time = 170; duration = 15; priority = 3 };  
-  { start_time = 190; duration = 10; priority = 2 };
-  { start_time = 170; duration = 5; priority = 2 };  
-  ]in
-
-  Printf.printf "Test min idle time";
-  Printf.printf "\n";
-  Printf.printf "Test case 3";
-  Printf.printf "\n";
-  
-  let min_idle_time2 = minimize_idle_time t3 in
-  print_job_list min_idle_time2;
-
-  Printf.printf "-------------------------------------------";
-  (*Actual main running*)
-  (*Prompt the user for input*)
+  (* Prompt the user for the number of jobs *)
   let job_num = get_job_number() in
-  let job_list = read_jobs job_num in
-  
-  let test = schedule_jobs job_list in (*Test schedule_jobs on user input*)
 
-  print_job_list test;
- 
-  (* DEBUG: DELETE LATER*)
-  (* print_job_list job_list; *)
+  (* Prompt the user for the details of a list of jobs *)
+  let job_list = read_jobs (job_num) in
+
+  print_scheduled_jobs job_list;
