@@ -101,7 +101,7 @@ let schedule_jobs jobs=
         match scheduled with
         | [] -> overlap [job] tail (*if no jobs are scheduled, schedule the head job*)
         | last_job :: _ -> (*Check for overlap*)
-          if job.start_time >= (last_job.start_time + last_job.duration) then (*Checks if next job starts after the previous job fnishes or at exactly when the job finishes*)
+          if job.start_time >= (last_job.start_time + last_job.duration) then (*Checks if next job starts after the previous job finishes or at exactly when the job finishes*)
             overlap(job::scheduled) tail (*Schedule the current job if no overlap*)
           else
             overlap scheduled tail in (*skip current job due to overlap*)
@@ -129,6 +129,7 @@ let print_job_list job_list =
 (* Main program *)
 let () = 
   (*Test no overlap*)
+  Printf.printf "-------------------------------------------------\n";
   Printf.printf "Test no overlap";
   Printf.printf "\n";
   let jobs = [
@@ -136,22 +137,70 @@ let () =
   { start_time = 660; duration = 45;priority = 5};
   ]in
 
+  let jobs1 = [{start_time = 580; duration = 60; priority = 7};
+               {start_time = 550; duration = 100; priority = 8};
+               {start_time = 750; duration = 10; priority = 1};]in
+  let jobs2 = [{start_time = 20; duration = 60; priority = 7};
+               {start_time = 50; duration = 100; priority = 8};
+               {start_time = 100; duration = 10; priority = 1};]in
   let tst = schedule_jobs jobs in
-  print_job_list tst;
-  Printf.printf "------------------------------------------";
-  Printf.printf "Test min idle time";
+  let tst1 = schedule_jobs jobs1 in
+  let tst2 = schedule_jobs jobs2 in
+  Printf.printf "Testcase 1";
   Printf.printf "\n";
+  print_job_list tst;
+  Printf.printf "Testcase 2";
+  Printf.printf "\n";
+  print_job_list tst1;
+  Printf.printf "Testcase 3";
+  Printf.printf "\n";
+  print_job_list tst2;
+  
+  
   (*Test minimize idle time*)
-  let jobs = [
+  let t1 = [
   { start_time = 540; duration = 60; priority = 2 };  
   { start_time = 510; duration = 20; priority = 2 };
   { start_time = 520; duration = 45; priority = 3 };  
   { start_time = 610; duration = 30; priority = 2 };  
   ]in
-
-  let min_idle_time = minimize_idle_time jobs in
-
+  Printf.printf "------------------------------------------\n";
+  Printf.printf "Test min idle time";
+  Printf.printf "\n";
+  Printf.printf "Test case 1";
+  Printf.printf "\n";
+  let min_idle_time = minimize_idle_time t1 in
   print_job_list min_idle_time;
+
+  let t2 = [
+  { start_time = 40; duration = 10; priority = 2 };  
+  { start_time = 60; duration = 20; priority = 2 };
+  { start_time = 100; duration = 15; priority = 3 };  
+  { start_time = 90; duration = 10; priority = 2 };  
+  ]in
+
+  Printf.printf "Test min idle time";
+  Printf.printf "\n";
+  Printf.printf "Test case 2";
+  Printf.printf "\n";
+  let min_idle_time1 = minimize_idle_time t2 in
+  print_job_list min_idle_time1;
+
+  let t3 = [
+  { start_time = 100; duration = 60; priority = 2 };  
+  { start_time = 150; duration = 10; priority = 2 };
+  { start_time = 170; duration = 15; priority = 3 };  
+  { start_time = 190; duration = 10; priority = 2 };
+  { start_time = 170; duration = 5; priority = 2 };  
+  ]in
+
+  Printf.printf "Test min idle time";
+  Printf.printf "\n";
+  Printf.printf "Test case 3";
+  Printf.printf "\n";
+  
+  let min_idle_time2 = minimize_idle_time t3 in
+  print_job_list min_idle_time2;
 
   Printf.printf "-------------------------------------------";
   (*Actual main running*)
