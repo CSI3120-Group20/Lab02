@@ -214,12 +214,3 @@ let () =
  
   (* DEBUG: DELETE LATER*)
   (* print_job_list job_list; *)
-
-
-(* Main method down here: *)
-(* Printf.printf "How many jobs do you want to schedule? ";
-let num_jobs = input_line stdin in
-let () = (read_jobs num_jobs)
-
-Printf.printf "Choose a scheduling strategy (1 for No Overlaps, 2 for Max Priority, 3 for Minimize Idle Time): ";
-let scheduling_strategy = input_line stdin in print_endline scheduling_strategy; *)
