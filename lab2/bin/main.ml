@@ -245,7 +245,7 @@ let print_scheduled_jobs (job_list) =
 (* Main program *)
 let () = 
   (* Prompt the user for the number of jobs *)
-  let job_num = job_number() in
+  let job_num = get_job_number() in
 
   (* Prompt the user for the details of a list of jobs *)
   let job_list = read_jobs (job_num) in
