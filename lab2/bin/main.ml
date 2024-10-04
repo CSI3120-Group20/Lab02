@@ -10,7 +10,7 @@ type job = {
 * 
 * Return the number of jobs `num_jobs`
 *)
-let rec job_number() = 
+let rec get_job_number() = 
   print_string "How many jobs do you want to schedule? ";
   
   (* Read the input from user and store it in `input` *)
@@ -22,7 +22,7 @@ let rec job_number() =
 
     if num_jobs < 0 then(
       print_endline "Please enter a positive integer.";
-      job_number()
+      get_job_number()
     )
 
     else if num_jobs = 0 then(
@@ -39,7 +39,7 @@ let rec job_number() =
     with
     | Failure _ ->
       print_endline "Invalid input. Please enter a non-negative integer.";
-      job_number()
+      get_job_number()
 
 
 let time_to_minutes hrs mins = 
@@ -161,7 +161,7 @@ let no_overlab_schedule jobs =
         match scheduled with
         | [] -> overlap [job] tail (*if no jobs are scheduled, schedule the head job*)
         | last_job :: _ -> (*Check for overlap*)
-          if job.start_time >= (last_job.start_time + last_job.duration) then (*Checks if next job starts after the previous job fnishes or at exactly when the job finishes*)
+          if job.start_time >= (last_job.start_time + last_job.duration) then (*Checks if next job starts after the previous job finishes or at exactly when the job finishes*)
             overlap(job::scheduled) tail (*Schedule the current job if no overlap*)
           else
             overlap scheduled tail in (*skip current job due to overlap*)
